@@ -10,10 +10,10 @@ docker compose up -d
 (Podaci za prijavu nalaze se unutar docker-compose.yml datoteke).
 
 Struktura repozitorija:
-docker-compose.yml – Konfiguracija Neo4j Docker kontejnera.
-queries.cypher – Svi korišteni upiti (unos, povezivanje, pretraga).
-ODGOVORI.md – Tekstualni odgovori na zadana pitanja.
-Screenshots/ – Snimke zaslona grafičkih prikaza i rezultata iz baze.
+* docker-compose.yml – Konfiguracija Neo4j Docker kontejnera.
+* queries.cypher – Svi korišteni upiti (unos, povezivanje, pretraga).
+* ODGOVORI.md – Tekstualni odgovori na zadana pitanja.
+* Screenshots/ – Snimke zaslona grafičkih prikaza i rezultata iz baze.
 
 
 Unos čvorova i definirati relacije između njih.
