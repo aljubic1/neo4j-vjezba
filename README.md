@@ -4,9 +4,9 @@ Ovaj projekt prikazuje modeliranje podataka i izvršavanje Cypher upita unutar N
 
 Za podizanje okruženja potreban je Docker Desktop.
 
-U terminalu pozicioniranom u korijenski direktorij pokrenite:
+1. U terminalu pozicioniranom u korijenski direktorij pokrenite:
 docker compose up -d
-Otvorite Neo4j Browser na adresi: http://localhost:7474
+2. Otvorite Neo4j Browser na adresi: http://localhost:7474
 (Podaci za prijavu nalaze se unutar docker-compose.yml datoteke).
 
 Struktura repozitorija:
