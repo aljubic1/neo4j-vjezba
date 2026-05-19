@@ -1,4 +1,4 @@
-*Neo4j_vjezba*
+#*Neo4j_vjezba*
 Ovaj projekt prikazuje modeliranje podataka i izvršavanje Cypher upita unutar Neo4j graf baze. Fokus je na povezivanju entiteta (osobe, filmovi, gradovi), postavljanju indeksa i ograničenja te vizualizaciji rezultata.
 
 Za podizanje okruženja potreban je Docker Desktop.
