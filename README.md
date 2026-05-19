@@ -15,7 +15,3 @@ Struktura repozitorija:
 * ODGOVORI.md – Tekstualni odgovori na zadana pitanja.
 * Screenshots/ – Snimke zaslona grafičkih prikaza i rezultata iz baze.
 
-
-Unos čvorova i definirati relacije između njih.
-Rad s indeksima i ograničenjima (Constraints) za optimizaciju performansi.
-Filtriranje i analiza podataka kroz vizualni graf u Neo4j Browseru.
