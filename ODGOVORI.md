@@ -7,17 +7,14 @@ Neo4j standardno eksponira dva glavna porta za komunikaciju i rad s bazom:
 CREATE: Ova naredba bezuvjetno kreira novi čvor ili vezu u grafu svaki put kada se pokrene. Čak i ako u bazi već postoji čvor s potpuno istim imenom i svojstvima (npr. grad 'Paris'), `CREATE` će napraviti još jedan identičan čvor, što dovodi do dupliciranja podataka.
 MERGE: Ova naredba radi po principu "pronađi ili kreiraj" (idempotentna operacija). Prije nego što bilo što napravi, `MERGE` prvo pretražuje graf kako bi provjerio postoji li već čvor s tim svojstvima. Ako ga pronađe, samo ga dohvaća i ne radi ništa; ako ga ne pronađe, tek ga tada kreira. `MERGE` se koristi za sprječavanje nastanka duplikata u bazi podataka.
 
-#Zadatak 4 — Razlika između MATCH i OPTIONAL MATCH
+#Zadatak 4 — MATCH upiti: čitanje i filtriranje
 MATCH: Djeluje kao strogi filtar u grafu (slično kao INNER JOIN u SQL-u). Ako tražimo određeni uzorak (npr. Osoba i njezin Grad), `MATCH` će vratiti samo one retke gdje taj uzorak u potpunosti postoji. Ako neka osoba nema vezu prema gradu, ona će biti potpuno izbačena iz rezultata upita.
 OPTIONAL MATCH: Djeluje fleksibilnije (slično kao LEFT JOIN u SQL-u). Ona će pokušati pronaći traženi uzorak ili vezu, ali ako veza ne postoji, upit neće izbaciti polazni čvor iz rezultata. Umjesto toga, vratit će polazni čvor, dok će za dijelove grafa koji nedostaju jednostavno prikazati vrijednost `null`.
 
 #Zadatak 5 — Putovi i traversal
+Ako funkcija shortestPath (primjerice u Neo4j-u) ne pronađe put između dva čvora, to znači da su ti čvorovi u grafu potpuno nepovezani. U tom slučaju, upit neće vratiti nikakve podatke o putu, odnosno rezultat će biti prazan (null ili prazan skup redaka).
+#komentar na zadatak 
 U bazi podataka ne postoji nikakva izravna ni neizravna veza između Leonarda DiCaprija i Bong Joon-hoa, stoga upit opravdano vraća prazan rezultat.
-1. Najkraći put (Leonardo DiCaprio — Bong Joon-ho):
-   U bazi podataka ne postoji izravna niti neizravna veza između ova dva čvora, zbog čega upit opravdano vraća prazan rezultat (*No changes, no records*).
-
-4. Ponašanje funkcije shortestPath ako put ne postoji:
-   Ako funkcija `shortestPath` ne uspije pronaći nijednu valjanu putanju između dva tražena čvora, upit neće javiti pogrešku niti prekinuti izvršavanje. Baza podataka će uspješno završiti rad, ali će rezultat biti prazan (vratit će 0 redaka), dok će sama varijabla puta poprimiti vrijednost `null`.
 
 # Odgovor na Završni zadatak — Glazbena scena
 Neo4j bismo za glazbenu bazu podataka koristili umjesto PostgreSQL-a u scenarijima gdje su nam fokus društvene veze, preporuke i duboki traversali kroz mrežu entiteta. Dok se PostgreSQL odlično snalazi s strukturiranim, izoliranim tablicama, problem preporuka ("korisnici koji slušaju bend X, također slušaju i bend Y") u relacijskim bazama zahtijeva višestruke i skupe `JOIN` operacije nad tablicama veza. 
