@@ -1,7 +1,12 @@
 // ==========================================
-// Zadatak 2 — Kreiranje čvorova
+// Vježba: Neo4j – Graf baze podataka i Cypher query jezik
 // ==========================================
+//Korak 1 — Pokretanje Neo4j okruženja
+U terminalu sam naredbama mkdir neo4j-vjezba i cd neo4j-vjezba kreirala radnu mapu i ušla u nju. Zatim sam stvorila datoteku docker-compose.yml u kojoj sam konfigurirala Neo4j servis, postavila portove 7474 i 7687, upisala korisničke podatke neo4j/vjezba2026 i dodala volumen neo4j_data za spas podataka. Naredbom docker compose up -d pokrenula sam kontejner u pozadini, a naredbom docker compose ps provjerila da je u stanju 'running'. Na kraju sam u pregledniku otvorila adresu http://localhost:7474, prijavila se u Neo4j Browser i izvršila testni upit RETURN 'Neo4j radi!' AS poruka;.
+//ZADATAK 1 
+U terminalu sam naredbom docker compose up -d pokrenula Neo4j kontejner u pozadini i pričekala da se sustav podigne. Nakon toga sam u web pregledniku otvorila adresu http://localhost:7474 te se u sučelje prijavila s korisničkim imenom neo4j i lozinkom vjezba2026. Unutar otvorenog Neo4j Browsera izvršila sam testni upit RETURN 'Neo4j radi!' AS poruka; i potvrdila da baza uspješno vraća rezultat. Na kraju sam u datoteku ODGOVORI.md zapisala objašnjenje za dva eksponirana porta: port 7474 koji služi kao HTTP veza za pristup web sučelju Neo4j Browsera, te port 7687 koji koristi Bolt protokol za komunikaciju s aplikacijskim driverima.
 
+// Zadatak 2 — Kreiranje čvorova
 // Kreiranje filmova iz predloška
 CREATE (:Film {naslov: 'Inception', godina: 2010, ocjena: 8.8, zanr: 'sci-fi'}),
        (:Film {naslov: 'The Dark Knight', godina: 2008, ocjena: 9.0, zanr: 'akcija'}),
@@ -37,9 +42,7 @@ CREATE (:Grad {naziv: 'Los Angeles'}),
 // Moj dodatni grad po vlastitom izboru
 CREATE (:Grad {naziv: 'Paris'});
 
-// ==========================================
 // Korak 3 — Kreiranje čvorova
-// ==========================================
 MATCH (o:Osoba {ime: 'Christopher Nolan'}), (f:Film {naslov: 'Inception'})
 CREATE (o)-[:REZIRAO]->(f);
 MATCH (o:Osoba {ime: 'Christopher Nolan'}), (f:Film {naslov: 'The Dark Knight'})
@@ -79,16 +82,15 @@ CREATE (a)-[:PRIJATELJ {od: 2010}]->(b)
 //Nakon unosa, vizualizirajte graf u Neo4j Browseru pokretanjem:
 MATCH (n)-[r]->(m) RETURN n, r, m
 
-//11.	dodati veze GLUMIO_U za dva čvora Osoba koje ste sami kreirali u Zadatku 2 (povežite ih s postojećim ili novim filmovima)
 // Povezivanje Michaela Cainea s filmovima The Dark Knight i Inception
 MATCH (o:Osoba {ime: 'Michael Caine'}), (f1:Film {naslov: 'The Dark Knight'}) CREATE (o)-[:GLUMIO_U]->(f1);
 MATCH (o:Osoba {ime: 'Michael Caine'}), (f2:Film {naslov: 'Inception'}) CREATE (o)-[:GLUMIO_U]->(f2);
+
 // Povezivanje Morgana Freemana s filmom The Dark Knight
 MATCH (o:Osoba {ime: 'Morgan Freeman'}), (f:Film {naslov: 'The Dark Knight'}) CREATE (o)-[:GLUMIO_U]->(f);
 
 // Provjera ukupnog broja veza po tipu
 MATCH ()-[r]->() RETURN type(r) AS tip, count(*) AS broj ORDER BY broj DESC;
-
 
 //Svi filmovi u bazi:
 MATCH (f:Film)
@@ -123,33 +125,29 @@ OPTIONAL MATCH (o)-[:REZIRAO]->(f:Film)
 RETURN o.ime, count(f) AS broj_reziranih_filmova
 ORDER BY broj_reziranih_filmova DESC
 
-
-
-Zadatak 4
-//1.	pronaći sve filmove žanra 'triler' sortirane po godini uzlazno
+// Zadatak 4
+//pronaći sve filmove žanra 'triler' sortirane po godini uzlazno
 MATCH (f:Film)
 WHERE f.zanr = 'triler'
 RETURN f.naslov, f.godina, f.ocjena
 ORDER BY f.godina ASC;
 
-//1.	pronaći ime redatelja i naziv grada u kojem živi (MATCH s dvije veze u nizu)
+//pronaći ime redatelja i naziv grada u kojem živi (MATCH s dvije veze u nizu)
 MATCH (o:Osoba)-[:REZIRAO]->(:Film)
 MATCH (o)-[:ZIVI_U]->(g:Grad)
 RETURN DISTINCT o.ime AS redatelj, g.naziv AS grad;
 
-//15.	pronaći sve filmove snimljene između 2008. i 2015. godine (WHERE s AND uvjetom)
+//pronaći sve filmove snimljene između 2008. i 2015. godine (WHERE s AND uvjetom)
 MATCH (f:Film)
 WHERE f.godina >= 2008 AND f.godina <= 2015
 RETURN f.naslov, f.godina;
 
-//16.	pronaći redatelje koji su snimili više od jednog filma (koristite collect ili count)
+//pronaći redatelje koji su snimili više od jednog filma (koristite collect ili count)
 MATCH (o:Osoba)-[:REZIRAO]->(f:Film)
 WITH o.ime AS redatelj, count(f) AS broj_filmova
 WHERE broj_filmova > 1
 RETURN redatelj, broj_filmova;
 
-
--------------------
 //Varijabilna dužina puta — tko je u dvije veze od filma Inception
 MATCH (f:Film {naslov: 'Inception'})-[*1..2]-(n)
 RETURN DISTINCT labels(n) AS tip, n.naslov AS naslov, n.ime AS ime
@@ -170,7 +168,6 @@ MATCH (b:Osoba {ime: 'Christopher Nolan'})
 RETURN EXISTS {
   MATCH (a)-[:PRIJATELJ|GLUMIO_U|ZIVI_U*1..3]-(b)
 } AS povezani
-
 //true
 
 //Svi putovi između dvije osobe — ne samo najkraći:
@@ -181,12 +178,11 @@ RETURN p, length(p) AS duljina
 ORDER BY duljina
 LIMIT 5
 
-
-
 //Zadatak 5 — Putovi i traversal
-//18.	pronaći najkraći put između Leonarda DiCaprija i Bong Joon-hoa i napraviti screenshot vizualizacije puta
+//pronaći najkraći put između Leonarda DiCaprija i Bong Joon-hoa i napraviti screenshot vizualizacije puta
 MATCH p = shortestPath((a:Osoba {ime: 'Leonardo DiCaprio'})-[*]-(b:Osoba {ime: 'Bong Joon-ho'}))
 RETURN p;
+
 //provjera povezanosti
 MATCH (a:Osoba {ime: 'Leonardo DiCaprio'})
 MATCH (b:Osoba {ime: 'Bong Joon-ho'})
@@ -196,16 +192,15 @@ RETURN EXISTS {
 
 //false -nisu povezani
 
-//19.	pronaći sve čvorove koji su u najviše 2 veze udaljeni od čvora Grad {naziv: 'London'}
+//pronaći sve čvorove koji su u najviše 2 veze udaljeni od čvora Grad {naziv: 'London'}
 MATCH (g:Grad {naziv: 'London'})-[*1..2]-(n)
 RETURN DISTINCT labels(n) AS tip, coalesce(n.naslov, n.ime, n.naziv) AS naziv;
 
-//20.	provjeriti jesu li Francis Ford Coppola i Leonardo DiCaprio međusobno povezani u najviše 4 koraka
+//provjeriti jesu li Francis Ford Coppola i Leonardo DiCaprio međusobno povezani u najviše 4 koraka
 MATCH (a:Osoba {ime: 'Francis Ford Coppola'}), (b:Osoba {ime: 'Leonardo DiCaprio'})
 RETURN EXISTS { MATCH (a)-[*1..4]-(b) } AS povezani;
 
-//21.	u ODGOVORI.md objasniti što se dogodi ako shortestPath ne pronađe put između dva čvora i što vraća upit (1–2 rečenice)
-
+//u ODGOVORI.md objasniti što se dogodi ako shortestPath ne pronađe put između dva čvora i što vraća upit 
 
 //Korak 6 — Agregacije s WITH
 //Broj filmova po žanru:
@@ -220,7 +215,6 @@ WHERE broj > 1
 RETURN zanr, broj, round(prosjecna_ocjena * 10) / 10 AS ocjena
 ORDER BY prosjecna_ocjena DESC
 
-
 //Redatelji s brojem filmova i listom naslova:
 MATCH (o:Osoba)-[:REZIRAO]->(f:Film)
 WITH o.ime AS redatelj, count(f) AS filmova, collect(f.naslov) AS naslovi
@@ -234,37 +228,28 @@ RETURN zanr,
        [film IN top_filmovi | film.naslov + ' (' + toString(film.ocjena) + ')']
        AS top3
 
-//// ======================================================================================
+=====================================================================================
 // NAPOMENA O SYNTAX ERRORU (collect):
 // Stari upit je bacao grešku jer funkcija collect() u Cypheru ne dopušta unutar sebe ORDER BY.
 // Popravak: Prvo sortiramo filmove pomoću WITH, a tek onda radimo collect() nad sortiranim nizom.
-// ======================================================================================
+=====================================================================================
 MATCH (f:Film)
 WITH f ORDER BY f.ocjena DESC
 WITH f.zanr AS zanr, collect(f)[0..3] AS top_filmovi
 RETURN zanr, [film IN top_filmovi | film.naslov + ' (' + toString(film.ocjena) + ')'] AS top3;
 
-
-Zadatak 6 — Agregacije
-22.	prikazati ukupan broj filmova i prosječnu ocjenu svih filmova u bazi (jedan upit, bez grupiranja)
-23.	prikazati broj filmova po žanru i maksimalnu ocjenu unutar svakog žanra (WITH + max)
-24.	pronaći osobu koja živi u gradu s najviše osoba — koristite WITH i ORDER BY count DESC LIMIT 1
-25.	prikazati listu svih glumaca za svaki film (MATCH s vezom GLUMIO_U, collect glumaca po filmovima)
-// ==========================================
 // Zadatak 6 — Agregacije
-// ==========================================
-
-// 1. Ukupan broj filmova i prosječna ocjena svih filmova u bazi
+// Ukupan broj filmova i prosječna ocjena svih filmova u bazi
 MATCH (f:Film)
 RETURN count(f) AS ukupan_broj_filmova, avg(f.ocjena) AS prosjecna_ocjena;
 
-// 2. Broj filmova po žanru i maksimalna ocjena unutar svakog žanra
+// Broj filmova po žanru i maksimalna ocjena unutar svakog žanra
 MATCH (f:Film)
 WITH f.zanr AS zanr, count(f) AS broj_filmova, max(f.ocjena) AS maksimalna_ocjena
 RETURN zanr, broj_filmova, maksimalna_ocjena
 ORDER BY broj_filmova DESC;
 
-// 3. Osoba koja živi u gradu s najviše osoba
+// Osoba koja živi u gradu s najviše osoba
 MATCH (o:Osoba)-[:ZIVI_U]->(g:Grad)
 WITH g, count(o) AS broj_stanovnika
 ORDER BY broj_stanovnika DESC
@@ -272,20 +257,19 @@ LIMIT 1
 MATCH (stanovnik:Osoba)-[:ZIVI_U]->(g)
 RETURN stanovnik.ime AS ime_osobe, g.naziv AS najpopularniji_grad;
 
-// 4. Lista svih glumaca za svaki film
+// Lista svih glumaca za svaki film
 MATCH (o:Osoba)-[:GLUMIO_U]->(f:Film)
 RETURN f.naslov AS film, collect(o.ime) AS lista_glumaca;
 
-// ======================================================================================
+=====================================================================================
 // NAPOMENA O SYNTAX ERRORU (collect):
 // Stari upit iz predloška je bacao grešku jer funkcija collect() u Cypheru ne dopušta unutar sebe ORDER BY.
 // Popravak: Prvo sortiramo filmove pomoću WITH, a tek onda radimo collect() nad sortiranim nizom.
-// ======================================================================================
+=====================================================================================
 MATCH (f:Film)
 WITH f ORDER BY f.ocjena DESC
 WITH f.zanr AS zanr, collect(f)[0..3] AS top_filmovi
 RETURN zanr, [film IN top_filmovi | film.naslov + ' (' + toString(film.ocjena) + ')'] AS top3;
-
 
 //Korak 7 — Indeksi i Constraints
 //Kreiranje RANGE indeksa za pretragu filmova po ocjeni:
@@ -302,12 +286,10 @@ CREATE CONSTRAINT film_naslov_nn
 FOR (f:Film) REQUIRE f.naslov IS NOT NULL
 
 //Provjera svih indeksa i constraint-a u bazi:
-
 SHOW INDEXES
 SHOW CONSTRAINTS
 
 //Test MERGE s constraint-om — pokušajmo dodati film s naslovom koji već postoji:
-
 // Ovo ce baciti gresku jer Inception vec postoji (UNIQUE constraint)
 CREATE (f:Film {naslov: 'Inception', godina: 2025, ocjena: 5.0})
 
@@ -317,27 +299,20 @@ ON MATCH SET f.opis = 'Klasik Christophera Nolana'
 ON CREATE SET f.godina = 2010, f.ocjena = 8.8
 RETURN f
 
-MERGE s ON MATCH i ON CREATE 
-klauzulama je posebno korisno za upsert operacije — update ako čvor postoji, insert ako ne postoji. Ovo je čest pattern u ETL pipelinima koji učitavaju podatke u Neo4j.
-
-
-// ======================================================================================
+=====================================================================================
 // Zadatak 7 — Indeksi i Constraints
-// ======================================================================================
-
+=====================================================================================
 // Uspješno kreiranje NOT NULL ograničenja na naslov filma
 CREATE CONSTRAINT film_naslov_nn FOR (f:Film) REQUIRE f.naslov IS NOT NULL;
 
-// --------------------------------------------------------------------------------------
 // NAPOMENA O GREŠCI (Neo.ClientError.Schema.IndexAlreadyExists):
 // Sljedeća naredba bi bacila grešku jer u bazi već postoji obični indeks "film_naslov":
 // CREATE CONSTRAINT film_naslov_unique FOR (f:Film) REQUIRE f.naslov IS UNIQUE;
-//
+
 // OBJAŠNJENJE: UNIQUE constraint u Neo4j-u u pozadini automatski pokušava kreirati vlastiti 
 // indeks jedinstvenosti. Budući da isti indeks već postoji na polju f.naslov, baza brani 
 // kreiranje constrainta dok se obični indeks prvo ne ukloni naredbom DROP INDEX.
 // Ova naredba je stoga svjesno preskočena kako se ne bi narušila struktura grafa.
-// --------------------------------------------------------------------------------------
 
 // Kreiranje ostalih važećih indeksa
 CREATE INDEX film_ocjena FOR (f:Film) ON (f.ocjena);
@@ -346,47 +321,15 @@ CREATE INDEX osoba_ime FOR (o:Osoba) ON (o.ime);
 // Provjera trenutnog stanja svih ograničenja u sustavu
 SHOW CONSTRAINTS;
 
-// ======================================================================================
-// Zadatak 7 — Indeksi i Constraints
-// ======================================================================================
-
-// --------------------------------------------------------------------------------------
-// NAPOMENA O GREŠCI (Property existence constraint requires Neo4j Enterprise Edition):
-// Sljedeća naredba za NOT NULL ograničenje je zakomentirana jer Community Edition (besplatna verzija)
-// ne podržava provjeru postojanja svojstva (NODE PROPERTY EXISTENCE):
-//
-// CREATE CONSTRAINT film_naslov_nn FOR (f:Film) REQUIRE f.naslov IS NOT NULL;
-// --------------------------------------------------------------------------------------
-
-// --------------------------------------------------------------------------------------
-// NAPOMENA O GREŠCI (Neo.ClientError.Schema.IndexAlreadyExists):
-// Sljedeća naredba bi također bacila grešku jer u bazi već postoji obični indeks "film_naslov":
-//
-// CREATE CONSTRAINT film_naslov_unique FOR (f:Film) REQUIRE f.naslov IS UNIQUE;
-// --------------------------------------------------------------------------------------
-
-// Kreiranje bazičnih indeksa koji provjereno rade u besplatnoj (Community) verziji:
-CREATE INDEX film_ocjena FOR (f:Film) ON (f.ocjena);
-CREATE INDEX osoba_ime FOR (o:Osoba) ON (o.ime);
-
-// Provjera trenutnog stanja svih ograničenja i indeksa u sustavu
-SHOW INDEXES;
-
-
-
------------------------------------
-//Završni zadatak — vlastiti graf: Glazbena scena
-// =============================================================================
+//=============================================================================
 // ZAVRŠNI ZADATAK — GLAZBENA SCENA
-// =============================================================================
+//=============================================================================
 
 // 1. KREIRANJE CONSTRAINT-A I INDEKSA (Zahtjev iz zadatka)
 CREATE CONSTRAINT izvodac_ime_unique FOR (i:Izvodac) REQUIRE i.ime IS UNIQUE;
 CREATE INDEX album_ocjena_idx FOR (a:Album) ON (a.ocjena);
 
-
 // 2. UNOS PODATAKA (6 Izvođača, 4 Žanra, 10 Albuma + Veze)
-
 // Kreiranje čvorova: Žanrovi (minimalno 4)
 CREATE (z1:Zanr {naziv: 'Rock'})
 CREATE (z2:Zanr {naziv: 'Heavy Metal'})
@@ -442,7 +385,6 @@ MATCH (i:Izvodac {ime: 'Daft Punk'}), (z:Zanr {naziv: 'Electronic'})
 CREATE (a:Album {naziv: 'Random Access Memories', godina: 2013, ocjena: 8.6})
 CREATE (i)-[:OBJAVIO]->(a), (a)-[:PRIPADA_ZANRU]->(z);
 
-
 // Kreiranje veza SLICAN (minimalno 4)
 MATCH (i1:Izvodac {ime: 'Pink Floyd'}), (i2:Izvodac {ime: 'Led Zeppelin'}) CREATE (i1)-[:SLICAN]->(i2);
 MATCH (i1:Izvodac {ime: 'Metallica'}), (i2:Izvodac {ime: 'Iron Maiden'}) CREATE (i1)-[:SLICAN]->(i2);
@@ -489,4 +431,3 @@ WHERE Prosječna_Ocjena > 7.5
 RETURN Žanr, Broj_Albuma, round(Prosječna_Ocjena * 10) / 10 AS Zaokružena_Ocjena
 ORDER BY Zaokružena_Ocjena DESC;
 
-```
